@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 성취기준 & 학습자료 추천 챗봇</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-gradient: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            --bg-gradient: linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%);
+            --chat-bg: rgba(255, 255, 255, 0.85);
+            --user-bubble: #6c5ce7;
+            --bot-bubble: #ffffff;
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --accent-korean: #ff7675;
+            --accent-color: #00b894;
+            --shadow-soft: 0 10px 40px rgba(0, 0, 0, 0.1);
+            --glass-border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 200% 200%;
+            animation: gradientBG 15s ease infinite;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Floating Shapes for Depth */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .shape-1 {
+            top: -10%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            background: #ff9ff3;
+            animation-delay: 0s;
+        }
+
+        .shape-2 {
+            bottom: -10%;
+            right: -10%;
+            width: 600px;
+            height: 600px;
+            background: #54a0ff;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            top: 40%;
+            left: 40%;
+            width: 300px;
+            height: 300px;
+            background: #55efc4;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translate(0, 0);
+            }
+
+            50% {
+                transform: translate(30px, 50px);
+            }
+        }
+
+        /* Chat Container (Glassmorphism) */
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            background: var(--chat-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 30px;
+            box-shadow: var(--shadow-soft);
+            border: var(--glass-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header */
+        .chat-header {
+            padding: 1.5rem 2rem;
+            background: rgba(255, 255, 255, 0.5);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            z-index: 10;
+        }
+
+        .maker-badge {
+            font-family: 'Jua', sans-serif;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .header-title h1 {
+            font-family: 'Jua', sans-serif;
+            font-size: 2rem;
+            color: var(--text-main);
+            margin-bottom: 0.2rem;
+        }
+
+        .header-title p {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+        }
+
+        /* Chat Window */
+        .chat-window {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scroll-behavior: smooth;
+        }
+
+        /* Messages */
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 80%;
+            animation: slideUp 0.4s ease-out;
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            background: white;
+            flex-shrink: 0;
+        }
+
+        .message.user .avatar {
+            background: var(--primary-gradient);
+            color: white;
+        }
+
+        .bubble {
+            padding: 1.2rem 1.8rem;
+            border-radius: 20px;
+            font-size: 1rem;
+            line-height: 1.6;
+            background: var(--bot-bubble);
+            color: var(--text-main);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            border-top-left-radius: 2px;
+            position: relative;
+        }
+
+        .message.user .bubble {
+            background: var(--user-bubble);
+            background: var(--primary-gradient);
+            color: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 2px;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.25);
+        }
+
+        /* Suggestion Chips */
+        .suggestions {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .chip {
+            background: rgba(108, 92, 231, 0.05);
+            border: 1px solid rgba(108, 92, 231, 0.1);
+            padding: 0.6rem 1.2rem;
+            border-radius: 24px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .chip:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.2);
+        }
+
+        /* Resource Card */
+        .resource-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.2rem;
+            margin-top: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+            border-left: 5px solid var(--primary);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .resource-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .resource-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(108, 92, 231, 0.1);
+            color: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .resource-btn {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: opacity 0.2s;
+        }
+
+        .resource-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* Results List */
+        .result-item {
+            background: white;
+            padding: 1.2rem;
+            margin-bottom: 0.8rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(0, 0, 0, 0.02);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+        }
+
+        .result-item:hover {
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transform: scale(1.01);
+            border-color: var(--primary-light);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 20px;
+            width: fit-content;
+            margin-left: 3rem;
+            /* Align with bubbles */
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #b2bec3;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 1.5rem 2.5rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1.2rem 1.8rem;
+            border-radius: 50px;
+            border: 2px solid rgba(0, 0, 0, 0.05);
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            outline: none;
+            background: white;
+            font-family: 'Noto Sans KR', sans-serif;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.15);
+        }
+
+        .send-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 8px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-3px) scale(1.05);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <span class="maker-badge">✨ made by 시지혜</span>
+            <div class="header-title">
+                <h1>📚 수업자료 큐레이터봇</h1>
+                <p>학교 현장에 딱 맞는, 4학년 맞춤형 성취기준 & 학습자료 찾기</p>
+            </div>
+        </header>
+
+        <div id="chat-window" class="chat-window">
+            <div class="message bot">
+                <div class="avatar">🤖</div>
+                <div class="bubble">
+                    안녕하세요, 선생님! 오늘도 수업 준비로 힘드시죠? 🍎<br>
+                    <strong>성취기준 코드</strong>(예: 4국01-01)나 <strong>키워드</strong>를 말씀해주시면, 제가 딱 맞는 자료를 찾아드릴게요!
+                    <div class="suggestions">
+                        <div class="chip" onclick="setInput('4국03-01')">✍️ 쓰기 자료</div>
+                        <div class="chip" onclick="setInput('사회 변화')">🏙️ 사회 변화</div>
+                        <div class="chip" onclick="setInput('동물 분류')">🦁 과학 탐구</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden typing indicator template -->
+        <div id="typing-template" style="display:none">
+            <div class="typing-indicator" id="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="무엇을 도와드릴까요? (예: 중심 문장 찾는 법)" autocomplete="off">
+            </div>
+            <button class="send-btn" id="send-btn">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // Data (Story.ttl based)
+        const standards = [
+            { id: "4국01-01", desc: "중요한 내용과 주제를 파악하며 듣고 그 내용을 요약한다.", subject: "국어", code: "ex:K40101" },
+            { id: "4국01-02", desc: "원인과 결과의 관계를 고려하여 내용을 예측하며 듣고 말한다.", subject: "국어", code: "ex:K40102" },
+            { id: "4국03-01", desc: "중심 문장과 뒷받침 문장을 갖추어 문단을 쓰고, 문장과 문단을 중심으로 고쳐 쓴다.", subject: "국어", code: "ex:K40301" },
+            { id: "4국04-05", desc: "언어가 의사소통과 관계 형성의 수단임을 이해하고 국어를 소중히 여기는 태도를 지닌다.", subject: "국어", code: "ex:K40405" },
+            { id: "4사01–01", desc: "주변 여러 장소에서의 경험과 느낌을 다양한 방식으로 표현하고, 장소감을 나누며 서로 존중하는 태도를 지닌다.", subject: "사회", code: "ex:S40101" },
+            { id: "4사03-01", desc: "최근 사회 변화의 양상과 특징을 파악하고, 그로 인해 나타난 생활모습의 변화를 탐색한다.", subject: "사회", code: "ex:S40301" },
+            { id: "4사04-03", desc: "옛날부터 오늘날까지 통신수단의 변화에 따른 정보 교류와 의사소통 방식의 변화를 설명한다.", subject: "사회", code: "ex:S40403" },
+            { id: "4과01-01", desc: "일상생활에서 힘과 관련된 현상에 흥미를 갖고, 물체를 밀거나 당길 때 나타나는 현상을 관찰할 수 있다.", subject: "과학", code: "ex:SC40101" },
+            { id: "4과02-01", desc: "여러 가지 동물을 관찰하여 특징에 따라 동물을 분류할 수 있다.", subject: "과학", code: "ex:SC40201" },
+            { id: "4과02-02", desc: "다양한 환경에 서식하는 동물을 조사하여 동물의 생김새와 생활 방식이 환경과 관련되어 있음을 설명할 수 있다.", subject: "과학", code: "ex:SC40202" },
+            { id: "4과03-02", desc: "다양한 환경에 서식하는 식물을 조사하여 식물의 생김새와 생활 방식이 환경과 관련되어 있음을 설명할 수 있다.", subject: "과학", code: "ex:SC40302" }
+        ];
+
+        const resources = [
+            { name: "중심 문장과 뒷받침 문장 연습 활동지", url: "https://example-edu.com/files/writing_practice_01", type: "활동지", target: "ex:K40301" }
+        ];
+
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const typingTemplate = document.getElementById('typing-template').innerHTML;
+
+        function setInput(text) {
+            userInput.value = text;
+            handleSend();
+        }
+
+        function appendMessage(sender, htmlContent) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+
+            if (sender === 'bot') {
+                const avatar = document.createElement('div');
+                avatar.className = 'avatar';
+                avatar.innerText = '🤖';
+                msgDiv.appendChild(avatar);
+            }
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = htmlContent;
+
+            msgDiv.appendChild(bubble);
+            chatWindow.appendChild(msgDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.id = 'temp-typing';
+            div.innerHTML = typingTemplate;
+            chatWindow.appendChild(div);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('temp-typing');
+            if (el) el.remove();
+        }
+
+        function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // User Message
+            appendMessage('user', text);
+            userInput.value = '';
+
+            // Bot Thinking
+            showTyping();
+
+            setTimeout(() => {
+                removeTyping();
+                const results = searchStandards(text);
+
+                if (results.length === 0) {
+                    appendMessage('bot', `😓 <strong>'${text}'</strong>에 대한 결과를 찾을 수 없어요.<br>키워드를 조금 더 단순하게 입력해보시겠어요?`);
+                } else if (results.length === 1) {
+                    showStandardDetails(results[0]);
+                } else {
+                    let listHtml = `🔎 <strong>'${text}'</strong> 관련 성취기준을 ${results.length}개 찾았습니다!<br>가장 적절한 것을 선택해주세요.<br><br>`;
+                    results.forEach(item => {
+                        listHtml += `<div class="result-item" onclick="selectStandard('${item.code}')">
+                            <div class="result-id" style="color:#6c5ce7;">● [${item.subject}] ${item.id}</div>
+                            <div style="font-size:0.95rem; color:#555;">${item.desc}</div>
+                        </div>`;
+                    });
+                    appendMessage('bot', listHtml);
+                }
+            }, 800 + Math.random() * 500); // Random delay 0.8~1.3s
+        }
+
+        function searchStandards(query) {
+            query = query.toLowerCase().replace(/\s/g, "");
+            return standards.filter(s => {
+                const cleanId = s.id.toLowerCase().replace(/\s/g, "");
+                const cleanDesc = s.desc.toLowerCase().replace(/\s/g, "");
+                return cleanId.includes(query) || cleanDesc.includes(query);
+            });
+        }
+
+        window.selectStandard = function (code) {
+            removeTyping(); // just in case
+            showTyping();
+            setTimeout(() => {
+                removeTyping();
+                const item = standards.find(s => s.code === code);
+                if (item) showStandardDetails(item);
+            }, 600);
+        }
+
+        function showStandardDetails(item) {
+            let responseHtml = `
+                <div style="margin-bottom:1rem;">
+                    <strong>🎓 선택하신 성취기준입니다.</strong><br>
+                    <span style="font-size:1.2rem; font-weight:bold; color:#2d3436;">[${item.subject}] ${item.id}</span>
+                    <div style="background:rgba(108, 92, 231, 0.08); padding:15px; border-radius:12px; margin-top:8px; line-height:1.6; color:#444;">
+                        ${item.desc}
+                    </div>
+                </div>
+                이 기준에 딱 맞는 수업 자료를 찾아볼게요! 🕵️‍♀️
+            `;
+            appendMessage('bot', responseHtml);
+
+            // 2nd phase: Recommendation
+            setTimeout(() => {
+                showTyping();
+                setTimeout(() => {
+                    removeTyping();
+                    const matchedResource = resources.find(r => r.target === item.code);
+
+                    if (matchedResource) {
+                        const resHtml = `
+                            <strong>✨ 선생님을 위한 추천 자료발견!</strong>
+                            <div class="resource-card">
+                                <div class="resource-info">
+                                    <div class="resource-icon">📄</div>
+                                    <div>
+                                        <div style="font-weight:bold; font-size:1rem; color:#333;">${matchedResource.name}</div>
+                                        <div style="font-size:0.85rem; color:#888;">유형: ${matchedResource.type}</div>
+                                    </div>
+                                </div>
+                                <a href="${matchedResource.url}" target="_blank" class="resource-btn">다운로드</a>
+                            </div>
+                        `;
+                        appendMessage('bot', resHtml);
+                    } else {
+                        const googleQuery = encodeURIComponent(`초등 4학년 ${item.subject} ${item.id} 수업자료`);
+                        const youtubeQuery = encodeURIComponent(`초등 4학년 ${item.subject} ${item.desc} 수업`);
+
+                        const resHtml = `
+                            내부 DB에는 자료가 없지만, <strong>웹에서 엄선된 검색 결과</strong>를 가져왔습니다! 🌐<br>
+                            
+                            <div class="resource-card" style="border-left-color:#4285f4;">
+                                <div class="resource-info">
+                                    <span style="font-size:1.6rem;">🇬</span>
+                                    <div><strong>구글 검색 결과</strong><br><span style="font-size:0.8rem;color:#888;">선생님들의 수업 후기 및 자료</span></div>
+                                </div>
+                                <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="resource-btn" style="background:#4285f4">Google</a>
+                            </div>
+
+                             <div class="resource-card" style="border-left-color:#ff0000;">
+                                <div class="resource-info">
+                                    <span style="font-size:1.6rem;">📺</span>
+                                    <div><strong>유튜브 수업 영상</strong><br><span style="font-size:0.8rem;color:#888;">흥미 유발 & 개념 설명 영상</span></div>
+                                </div>
+                                <a href="https://www.youtube.com/results?search_query=${youtubeQuery}" target="_blank" class="resource-btn" style="background:#ff0000">YouTube</a>
+                            </div>
+                        `;
+                        appendMessage('bot', resHtml);
+                    }
+                }, 1000);
+            }, 600);
+        }
+
+        userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+        sendBtn.addEventListener('click', handleSend);
+
+    </script>
+</body>
+
+</html>
