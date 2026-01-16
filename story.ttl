@@ -1,0 +1,173 @@
+@prefix ex: <http://example.org/edu/> .
+@prefix schema: <http://schema.org/> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+### --- 과목 정의 (Subjects) --- ###
+ex:Korean a schema:AlignmentObject ; schema:name "국어" ; schema:educationalLevel "초등학교 4학년" .
+ex:SocialStudies a schema:AlignmentObject ; schema:name "사회" ; schema:educationalLevel "초등학교 4학년" .
+ex:Science a schema:AlignmentObject ; schema:name "과학" ; schema:educationalLevel "초등학교 4학년" .
+
+### --- [국어] 성취기준 --- ###
+ex:K40101 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국01-01" ;
+    schema:description "중요한 내용과 주제를 파악하며 듣고 그 내용을 요약한다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40102 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국01-02" ;
+    schema:description "원인과 결과의 관계를 고려하여 내용을 예측하며 듣고 말한다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40103 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국01-03" ;
+    schema:description "상황에 적절한 준언어⋅비언어적 표현을 활용하여 듣고 말한다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40201 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국02-01" ;
+    schema:description "글의 의미를 파악하며 유창하게 글을 읽는다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40202 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국02-02" ;
+    schema:description "문단과 글에서 중심 생각을 파악하고 내용을 간추린다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40203 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국02-03" ;
+    schema:description "질문을 활용하여 글을 예측하며 읽고 자신의 읽기 과정을 점검한다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40301 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국03-01" ;
+    schema:description "중심 문장과 뒷받침 문장을 갖추어 문단을 쓰고, 문장과 문단을 중심으로 고쳐 쓴다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40302 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국03-02" ;
+    schema:description "절차와 결과가 드러나게 정확한 표현으로 보고하는 글을 쓴다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40303 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국03-03" ;
+    schema:description "대상에 대한 자신의 의견과 그렇게 생각한 이유가 드러나게 글을 쓴다." ;
+    dcterms:subject ex:Korean .
+
+ex:K40405 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4국04-05" ;
+    schema:description "언어가 의사소통과 관계 형성의 수단임을 이해하고 국어를 소중히 여기는 태도를 지닌다." ;
+    dcterms:subject ex:Korean .
+
+
+### --- [사회] 성취기준 --- ###
+ex:S40101 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사01–01" ;
+    schema:description "주변 여러 장소에서의 경험과 느낌을 다양한 방식으로 표현하고, 장소감을 나누며 서로 존중하는 태도를 지닌다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40102 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사01–02" ;
+    schema:description "주변의 여러 장소를 살펴보고, 우리가 사는 곳을 더 살기 좋은 곳으로 만드는 방안을 탐색한다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40201 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사02-01" ;
+    schema:description "일상 속에서 시간의 흐름을 경험할 수 있는 사례를 살펴보고, 이를 바탕으로 역사의 시간 개념을 이해한다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40202 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사02-02" ;
+    schema:description "오래된 물건이나 자료들을 주변에서 찾아보고, 이를 통해 과거의 모습을 살펴볼 수 있음을 이해한다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40203 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사02-03" ;
+    schema:description "지역의 변화상을 보여주는 역사 자료를 분석하여 지역 사람들의 달라진 생활 모습을 파악한다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40301 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사03-01" ;
+    schema:description "최근 사회 변화의 양상과 특징을 파악하고, 그로 인해 나타난 생활모습의 변화를 탐색한다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40302 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사03-02" ;
+    schema:description "우리 사회에 다양한 문화가 확산되면서 나타나는 긍정적 효과와 문제를 분석하고, 나와 다른 사람이나 집단의 문화를 존중하는 태도를 기른다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40401 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사04-01" ;
+    schema:description "옛날 풍습에 대해 알아보고, 오늘날과 비교하여 변화상을 파악한다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40402 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사04-02" ;
+    schema:description "옛날부터 오늘날까지 교통의 변화에 따른 이동과 생활 모습의 변화를 이해한다." ;
+    dcterms:subject ex:SocialStudies .
+
+ex:S40403 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4사04-03" ;
+    schema:description "옛날부터 오늘날까지 통신수단의 변화에 따른 정보 교류와 의사소통 방식의 변화를 설명한다." ;
+    dcterms:subject ex:SocialStudies .
+
+
+### --- [과학] 성취기준 --- ###
+ex:SC40101 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과01-01" ;
+    schema:description "일상생활에서 힘과 관련된 현상에 흥미를 갖고, 물체를 밀거나 당길 때 나타나는 현상을 관찰할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40102 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과01-02" ;
+    schema:description "수평잡기 활동을 통해 물체의 무게를 비교할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40103 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과01-03" ;
+    schema:description "무게를 정확히 비교하기 위해서는 저울이 필요함을 알고, 저울을 사용해 무게를 비교할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40104 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과01-04" ;
+    schema:description "지레, 빗면과 같은 도구를 이용하면 물체를 들어 올릴 때 드는 힘의 크기가 달라짐을 알고, 도구가 일상생활에서 어떻게 쓰이는지 조사하여 공유할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40201 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과02-01" ;
+    schema:description "여러 가지 동물을 관찰하여 특징에 따라 동물을 분류할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40202 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과02-02" ;
+    schema:description "다양한 환경에 서식하는 동물을 조사하여 동물의 생김새와 생활 방식이 환경과 관련되어 있음을 설명할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40203 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과02-03" ;
+    schema:description "동물의 특징을 이용하여 일상생활에서 활용할 수 있는 생활용품을 설계하여 협력적으로 소통할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40301 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과03-01" ;
+    schema:description "여러 가지 식물을 관찰하여 특징에 따라 식물을 분류할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40302 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과03-02" ;
+    schema:description "다양한 환경에 서식하는 식물을 조사하여 식물의 생김새와 생활 방식이 환경과 관련되어 있음을 설명할 수 있다." ;
+    dcterms:subject ex:Science .
+
+ex:SC40303 a schema:EducationalOccupationalStandard ;
+    schema:identifier "4과03-03" ;
+    schema:description "식물의 특징을 이용하여 일상생활에서 활용할 수 있는 생활용품을 설계하여 협력적으로 소통할 수 있다." ;
+    dcterms:subject ex:Science .
+
+
+### --- 학습 자원 매칭 샘플 (Resource Matching Sample) --- ###
+# 예시: 특정 사이트의 활동지를 국어 4국03-01 기준에 매칭
+ex:Res_Writing_001 a schema:LearningResource ;
+    schema:name "중심 문장과 뒷받침 문장 연습 활동지" ;
+    schema:url <https://example-edu.com/files/writing_practice_01> ;
+    schema:learningResourceType "Worksheet" ;
+    schema:educationalAlignment ex:K40301 .

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 성취기준 & 학습자료 추천 챗봇</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@300;400;500;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --bg-color: #dfe6e9;
+            /* Chat background */
+            --chat-bg: #ffffff;
+            --user-bubble: #6c5ce7;
+            --bot-bubble: #f1f2f6;
+            --text-main: #2d3436;
+            --text-sub: #636e72;
+            --accent-korean: #ff7675;
+            --accent-social: #fdcb6e;
+            --accent-science: #00b894;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background-color: var(--bg-color);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Ambient Background */
+        .bg-shape {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.5;
+            animation: float 15s infinite ease-in-out alternate;
+        }
+
+        .shape-1 {
+            width: 500px;
+            height: 500px;
+            background: rgba(108, 92, 231, 0.3);
+            top: -100px;
+            left: -100px;
+        }
+
+        .shape-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(0, 184, 148, 0.2);
+            bottom: -50px;
+            right: -50px;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            100% {
+                transform: translate(40px, 60px) rotate(15deg);
+            }
+        }
+
+        /* Chat Container */
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background: var(--chat-bg);
+            border-radius: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Header */
+        .chat-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: white;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .header-title h1 {
+            font-family: 'Jua', sans-serif;
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+        }
+
+        /* Chat Window */
+        .chat-window {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            scroll-behavior: smooth;
+        }
+
+        /* Messages */
+        .message {
+            display: flex;
+            gap: 1rem;
+            max-width: 85%;
+            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            background: var(--bot-bubble);
+            color: var(--primary);
+        }
+
+        .message.user .avatar {
+            background: var(--user-bubble);
+            color: white;
+        }
+
+        .bubble {
+            padding: 1rem 1.5rem;
+            border-radius: 18px;
+            font-size: 1rem;
+            line-height: 1.5;
+            position: relative;
+            background: var(--bot-bubble);
+            color: var(--text-main);
+            border-top-left-radius: 2px;
+        }
+
+        .message.user .bubble {
+            background: var(--user-bubble);
+            color: white;
+            border-top-left-radius: 18px;
+            border-top-right-radius: 2px;
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+        }
+
+        /* Suggestion Chips */
+        .suggestions {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .chip {
+            background: white;
+            border: 1px solid #dfe6e9;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+        }
+
+        .chip:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Resource Card inside Chat */
+        .resource-card {
+            background: white;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-top: 0.8rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .resource-card:hover {
+            transform: scale(1.02);
+        }
+
+        .resource-info {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .resource-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(108, 92, 231, 0.1);
+            color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .resource-btn {
+            background: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        /* Result Item styling */
+        .result-item {
+            background: white;
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .result-item:hover {
+            background: #f9f9f9;
+        }
+
+        .result-id {
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: var(--primary);
+            margin-bottom: 0.3rem;
+        }
+
+        /* Input Area */
+        .input-area {
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            padding-right: 3rem;
+            border-radius: 50px;
+            border: 2px solid #f1f2f6;
+            font-size: 1rem;
+            transition: all 0.3s;
+            outline: none;
+            background: #f8f9fd;
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+        }
+
+        .send-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.1);
+            background: #5649c0;
+        }
+
+        @keyframes popIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="header-title">
+                <div
+                    style="font-family: 'Jua', sans-serif; font-size: 1rem; color: var(--primary); margin-bottom: 0.2rem;">
+                    made by 시지혜</div>
+                <h1>📚 수업자료 큐레이터봇</h1>
+                <p>초등학교 4학년 국어, 사회, 과학 성취기준을 검색하면 맞춤형 학습자료를 찾아드립니다.</p>
+            </div>
+            <!-- Decorative icon could go here -->
+        </header>
+
+        <div id="chat-window" class="chat-window">
+            <!-- Initial Welcome Message -->
+            <div class="message bot">
+                <div class="avatar">🤖</div>
+                <div class="bubble">
+                    안녕하세요 선생님! 👋<br>
+                    찾으시는 <strong>성취기준 코드</strong>(예: 4국01-01)나 <strong>키워드</strong>(예: 중심 문장)를 입력해주세요.
+                    <div class="suggestions">
+                        <div class="chip" onclick="setInput('4국03-01')">#4국03-01</div>
+                        <div class="chip" onclick="setInput('사회 변화')">#사회 변화</div>
+                        <div class="chip" onclick="setInput('동물 분류')">#동물 분류</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="user-input" placeholder="성취기준 또는 검색어를 입력하세요..." autocomplete="off">
+            </div>
+            <button class="send-btn" id="send-btn">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Data (Based on story.ttl) ---
+        const standards = [
+            // Korean
+            { id: "4국01-01", desc: "중요한 내용과 주제를 파악하며 듣고 그 내용을 요약한다.", subject: "국어", code: "ex:K40101" },
+            { id: "4국01-02", desc: "원인과 결과의 관계를 고려하여 내용을 예측하며 듣고 말한다.", subject: "국어", code: "ex:K40102" },
+            { id: "4국03-01", desc: "중심 문장과 뒷받침 문장을 갖추어 문단을 쓰고, 문장과 문단을 중심으로 고쳐 쓴다.", subject: "국어", code: "ex:K40301" },
+            { id: "4국04-05", desc: "언어가 의사소통과 관계 형성의 수단임을 이해하고 국어를 소중히 여기는 태도를 지닌다.", subject: "국어", code: "ex:K40405" },
+
+            // Social Studies
+            { id: "4사01–01", desc: "주변 여러 장소에서의 경험과 느낌을 다양한 방식으로 표현하고, 장소감을 나누며 서로 존중하는 태도를 지닌다.", subject: "사회", code: "ex:S40101" },
+            { id: "4사03-01", desc: "최근 사회 변화의 양상과 특징을 파악하고, 그로 인해 나타난 생활모습의 변화를 탐색한다.", subject: "사회", code: "ex:S40301" },
+            { id: "4사04-03", desc: "옛날부터 오늘날까지 통신수단의 변화에 따른 정보 교류와 의사소통 방식의 변화를 설명한다.", subject: "사회", code: "ex:S40403" },
+
+            // Science
+            { id: "4과01-01", desc: "일상생활에서 힘과 관련된 현상에 흥미를 갖고, 물체를 밀거나 당길 때 나타나는 현상을 관찰할 수 있다.", subject: "과학", code: "ex:SC40101" },
+            { id: "4과02-01", desc: "여러 가지 동물을 관찰하여 특징에 따라 동물을 분류할 수 있다.", subject: "과학", code: "ex:SC40201" },
+            { id: "4과02-02", desc: "다양한 환경에 서식하는 동물을 조사하여 동물의 생김새와 생활 방식이 환경과 관련되어 있음을 설명할 수 있다.", subject: "과학", code: "ex:SC40202" },
+            { id: "4과03-02", desc: "다양한 환경에 서식하는 식물을 조사하여 식물의 생김새와 생활 방식이 환경과 관련되어 있음을 설명할 수 있다.", subject: "과학", code: "ex:SC40302" }
+        ];
+
+        // Mapped Resources
+        const resources = [
+            {
+                name: "중심 문장과 뒷받침 문장 연습 활동지",
+                url: "https://example-edu.com/files/writing_practice_01",
+                type: "활동지",
+                target: "ex:K40301"
+            }
+        ];
+
+        // --- Logic ---
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        function setInput(text) {
+            userInput.value = text;
+            handleSend();
+        }
+
+        function appendMessage(sender, htmlContent) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}`;
+
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.innerText = sender === 'user' ? '🧑‍🏫' : '🤖';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerHTML = htmlContent;
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(bubble);
+
+            chatWindow.appendChild(msgDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function handleSend() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // 1. User Message
+            appendMessage('user', text);
+            userInput.value = '';
+
+            // 2. Simulate Bot Thinking (Short delay)
+            setTimeout(() => {
+                const results = searchStandards(text);
+
+                if (results.length === 0) {
+                    appendMessage('bot', `😓 <strong>'${text}'</strong>에 대한 성취기준을 찾지 못했습니다.<br>다른 키워드나 성취기준 코드로 검색해보세요.`);
+                } else if (results.length === 1) {
+                    // Exact or Single Match -> Show Details + Recommendation
+                    const item = results[0];
+                    showStandardDetails(item);
+                } else {
+                    // Multiple Matches -> List them
+                    let listHtml = `🔎 <strong>'${text}'</strong>와 관련된 성취기준 ${results.length}개를 찾았습니다.<br>원하시는 항목을 선택해주세요:<br><br>`;
+                    results.forEach(item => {
+                        listHtml += `<div class="result-item" onclick="selectStandard('${item.code}')">
+                            <div class="result-id">[${item.subject}] ${item.id}</div>
+                            <div>${item.desc.substring(0, 40)}...</div>
+                        </div>`;
+                    });
+                    appendMessage('bot', listHtml);
+                }
+            }, 600);
+        }
+
+        function searchStandards(query) {
+            query = query.toLowerCase().replace(/\s/g, ""); // Remove spaces for better matching
+            return standards.filter(s => {
+                const cleanId = s.id.toLowerCase().replace(/\s/g, "");
+                const cleanDesc = s.desc.toLowerCase().replace(/\s/g, "");
+                return cleanId.includes(query) || cleanDesc.includes(query);
+            });
+        }
+
+        // Called when user clicks a list item from multiple results
+        window.selectStandard = function (code) {
+            const item = standards.find(s => s.code === code);
+            if (item) showStandardDetails(item);
+        }
+
+        function showStandardDetails(item) {
+            // Standard Info
+            let responseHtml = `
+                Found it! 🎓<br>
+                <strong>[${item.subject}] ${item.id}</strong><br>
+                <div style="background:rgba(0,0,0,0.03); padding:10px; border-radius:8px; margin: 8px 0; font-style:italic;">
+                    "${item.desc}"
+                </div>
+                이 성취기준에 맞는 학습자료를 찾아보겠습니다...
+            `;
+            appendMessage('bot', responseHtml);
+
+            // Recommendation Logic (Delayed slightly for effect)
+            setTimeout(() => {
+                const matchedResource = resources.find(r => r.target === item.code);
+
+                if (matchedResource) {
+                    const resHtml = `
+                        ✨ <strong>추천 자료를 찾았습니다!</strong>
+                        <div class="resource-card">
+                            <div class="resource-info">
+                                <div class="resource-icon">📄</div>
+                                <div>
+                                    <div style="font-weight:bold; font-size:0.95rem;">${matchedResource.name}</div>
+                                    <div style="font-size:0.8rem; color:#888;">유형: ${matchedResource.type}</div>
+                                </div>
+                            </div>
+                            <a href="${matchedResource.url}" target="_blank" class="resource-btn">보기</a>
+                        </div>
+                    `;
+                    appendMessage('bot', resHtml);
+                } else {
+                    // Generate a dynamic search link if no internal DB match
+                    const googleQuery = encodeURIComponent(`초등 4학년 ${item.subject} ${item.id} 수업자료`);
+                    const youtubeQuery = encodeURIComponent(`초등 4학년 ${item.subject} ${item.desc} 수업`);
+
+                    const resHtml = `
+                        내부 데이터베이스에는 매칭된 자료가 없습니다. 🤔<br>
+                        하지만 <strong>외부 추천 검색 결과</strong>를 준비했습니다:
+                        
+                        <div class="resource-card">
+                            <div class="resource-info">
+                                <span style="font-size:1.5rem">🌐</span>
+                                <div><strong>구글 검색 결과</strong><br><span style="font-size:0.8rem;color:#888">선생님들이 많이 찾는 자료</span></div>
+                            </div>
+                            <a href="https://www.google.com/search?q=${googleQuery}" target="_blank" class="resource-btn" style="background:#4285f4">Google</a>
+                        </div>
+
+                         <div class="resource-card">
+                            <div class="resource-info">
+                                <span style="font-size:1.5rem">📺</span>
+                                <div><strong>유튜브 수업 영상</strong><br><span style="font-size:0.8rem;color:#888">관련 수업 사례 영상</span></div>
+                            </div>
+                            <a href="https://www.youtube.com/results?search_query=${youtubeQuery}" target="_blank" class="resource-btn" style="background:#ff0000">YouTube</a>
+                        </div>
+                    `;
+                    appendMessage('bot', resHtml);
+                }
+            }, 800);
+        }
+
+        // Event for Enter key
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSend();
+        });
+
+        // Event for clicking Search button
+        sendBtn.addEventListener('click', handleSend);
+
+    </script>
+</body>
+
+</html>
